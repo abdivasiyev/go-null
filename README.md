@@ -1,5 +1,7 @@
 ### go-null
 
+[![Test application](https://github.com/abdivasiyev/go-null/actions/workflows/test.yml/badge.svg?event=push)](https://github.com/abdivasiyev/go-null/actions/workflows/test.yml)
+
 Simple and lightweight library for working with sql null values
 
 Installation
