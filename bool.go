@@ -11,7 +11,7 @@ type Bool struct {
 	nullValue *sql.NullBool
 }
 
-func (s Bool) String() string {
+func (s *Bool) String() string {
 	if s.nullValue != nil {
 		return fmt.Sprint(s.nullValue.Bool)
 	}
@@ -19,8 +19,8 @@ func (s Bool) String() string {
 	return ""
 }
 
-func NewBool(value bool) Bool {
-	return Bool{
+func NewBool(value bool) *Bool {
+	return &Bool{
 		nullValue: &sql.NullBool{
 			Valid: true,
 			Bool:  value,
@@ -28,7 +28,7 @@ func NewBool(value bool) Bool {
 	}
 }
 
-func (s Bool) Get() bool {
+func (s *Bool) Get() bool {
 	if s.nullValue != nil {
 		return s.nullValue.Bool
 	}
@@ -45,6 +45,11 @@ func (s *Bool) Value() (driver.Value, error) {
 }
 
 func (s *Bool) Scan(value any) error {
+	s.nullValue = &sql.NullBool{
+		Bool:  false,
+		Valid: false,
+	}
+
 	if err := s.nullValue.Scan(value); err != nil {
 		return err
 	}
@@ -62,6 +67,7 @@ func (s *Bool) UnmarshalJSON(bytes []byte) error {
 		if err := json.Unmarshal(bytes, &s.nullValue.Bool); err != nil {
 			return err
 		}
+		s.nullValue.Valid = true
 	}
 
 	return nil

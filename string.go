@@ -18,8 +18,8 @@ func (s String) String() string {
 	return ""
 }
 
-func NewString(value string) String {
-	return String{
+func NewString(value string) *String {
+	return &String{
 		nullValue: &sql.NullString{
 			Valid:  value != "",
 			String: value,
@@ -35,7 +35,7 @@ func (s String) Get() string {
 	return ""
 }
 
-func (s *String) Value() (driver.Value, error) {
+func (s String) Value() (driver.Value, error) {
 	if s.nullValue != nil {
 		return s.nullValue.Value()
 	}
@@ -44,6 +44,10 @@ func (s *String) Value() (driver.Value, error) {
 }
 
 func (s *String) Scan(value any) error {
+	s.nullValue = &sql.NullString{
+		String: "",
+		Valid:  false,
+	}
 	if err := s.nullValue.Scan(value); err != nil {
 		return err
 	}
@@ -61,6 +65,7 @@ func (s *String) UnmarshalJSON(bytes []byte) error {
 		if err := json.Unmarshal(bytes, &s.nullValue.String); err != nil {
 			return err
 		}
+		s.nullValue.Valid = true
 	}
 
 	return nil

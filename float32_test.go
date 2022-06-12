@@ -8,7 +8,7 @@ import (
 func TestFloat32(t *testing.T) {
 	testCases := []struct {
 		name string
-		s    Float32
+		s    *Float32
 	}{
 		{
 			name: "Not null marshaller",

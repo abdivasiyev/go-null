@@ -9,7 +9,7 @@ import (
 func TestInt16(t *testing.T) {
 	testCases := []struct {
 		name            string
-		s               Int16
+		s               *Int16
 		marshalledBytes []byte
 	}{
 		{

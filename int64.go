@@ -19,8 +19,8 @@ func (s Int64) String() string {
 	return ""
 }
 
-func NewInt64(value int64) Int64 {
-	return Int64{
+func NewInt64(value int64) *Int64 {
+	return &Int64{
 		nullValue: &sql.NullInt64{
 			Valid: true,
 			Int64: value,
@@ -36,7 +36,7 @@ func (s Int64) Get() int64 {
 	return 0
 }
 
-func (s *Int64) Value() (driver.Value, error) {
+func (s Int64) Value() (driver.Value, error) {
 	if s.nullValue != nil {
 		return s.nullValue.Value()
 	}
@@ -62,6 +62,7 @@ func (s *Int64) UnmarshalJSON(bytes []byte) error {
 		if err := json.Unmarshal(bytes, &s.nullValue.Int64); err != nil {
 			return err
 		}
+		s.nullValue.Valid = true
 	}
 
 	return nil

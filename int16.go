@@ -19,8 +19,8 @@ func (s Int16) String() string {
 	return ""
 }
 
-func NewInt16(value int16) Int16 {
-	return Int16{
+func NewInt16(value int16) *Int16 {
+	return &Int16{
 		nullValue: &sql.NullInt16{
 			Valid: true,
 			Int16: value,
@@ -36,7 +36,7 @@ func (s Int16) Get() int16 {
 	return 0
 }
 
-func (s *Int16) Value() (driver.Value, error) {
+func (s Int16) Value() (driver.Value, error) {
 	if s.nullValue != nil {
 		return s.nullValue.Value()
 	}
@@ -45,6 +45,10 @@ func (s *Int16) Value() (driver.Value, error) {
 }
 
 func (s *Int16) Scan(value any) error {
+	s.nullValue = &sql.NullInt16{
+		Int16: 0,
+		Valid: false,
+	}
 	if err := s.nullValue.Scan(value); err != nil {
 		return err
 	}
@@ -62,6 +66,7 @@ func (s *Int16) UnmarshalJSON(bytes []byte) error {
 		if err := json.Unmarshal(bytes, &s.nullValue.Int16); err != nil {
 			return err
 		}
+		s.nullValue.Valid = true
 	}
 
 	return nil

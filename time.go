@@ -20,8 +20,8 @@ func (s Time) String() string {
 	return ""
 }
 
-func NewTime(value time.Time) Time {
-	return Time{
+func NewTime(value time.Time) *Time {
+	return &Time{
 		nullValue: &sql.NullTime{
 			Valid: true,
 			Time:  value,
@@ -37,7 +37,7 @@ func (s Time) Get() time.Time {
 	return time.Time{}
 }
 
-func (s *Time) Value() (driver.Value, error) {
+func (s Time) Value() (driver.Value, error) {
 	if s.nullValue != nil {
 		return s.nullValue.Value()
 	}
@@ -46,6 +46,10 @@ func (s *Time) Value() (driver.Value, error) {
 }
 
 func (s *Time) Scan(value any) error {
+	s.nullValue = &sql.NullTime{
+		Time:  time.Time{},
+		Valid: false,
+	}
 	if err := s.nullValue.Scan(value); err != nil {
 		return err
 	}
@@ -63,6 +67,7 @@ func (s *Time) UnmarshalJSON(bytes []byte) error {
 		if err := json.Unmarshal(bytes, &s.nullValue.Time); err != nil {
 			return err
 		}
+		s.nullValue.Valid = true
 	}
 
 	return nil

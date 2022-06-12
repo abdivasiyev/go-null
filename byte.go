@@ -19,8 +19,8 @@ func (s Byte) String() string {
 	return ""
 }
 
-func NewByte(value byte) Byte {
-	return Byte{
+func NewByte(value byte) *Byte {
+	return &Byte{
 		nullValue: &sql.NullByte{
 			Valid: true,
 			Byte:  value,
@@ -36,7 +36,7 @@ func (s Byte) Get() byte {
 	return 0
 }
 
-func (s *Byte) Value() (driver.Value, error) {
+func (s Byte) Value() (driver.Value, error) {
 	if s.nullValue != nil {
 		return s.nullValue.Value()
 	}
@@ -45,11 +45,12 @@ func (s *Byte) Value() (driver.Value, error) {
 }
 
 func (s *Byte) Scan(value any) error {
-	if err := s.nullValue.Scan(value); err != nil {
-		return err
+	s.nullValue = &sql.NullByte{
+		Byte:  0,
+		Valid: false,
 	}
 
-	return nil
+	return s.nullValue.Scan(value)
 }
 
 func (s *Byte) UnmarshalJSON(bytes []byte) error {
@@ -62,6 +63,7 @@ func (s *Byte) UnmarshalJSON(bytes []byte) error {
 		if err := json.Unmarshal(bytes, &s.nullValue.Byte); err != nil {
 			return err
 		}
+		s.nullValue.Valid = true
 	}
 
 	return nil

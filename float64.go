@@ -19,8 +19,8 @@ func (s Float64) String() string {
 	return ""
 }
 
-func NewFloat64(value float64) Float64 {
-	return Float64{
+func NewFloat64(value float64) *Float64 {
+	return &Float64{
 		nullValue: &sql.NullFloat64{
 			Valid:   true,
 			Float64: value,
@@ -45,6 +45,10 @@ func (s *Float64) Value() (driver.Value, error) {
 }
 
 func (s *Float64) Scan(value any) error {
+	s.nullValue = &sql.NullFloat64{
+		Valid:   false,
+		Float64: 0,
+	}
 	if err := s.nullValue.Scan(value); err != nil {
 		return err
 	}
@@ -62,6 +66,7 @@ func (s *Float64) UnmarshalJSON(bytes []byte) error {
 		if err := json.Unmarshal(bytes, &s.nullValue.Float64); err != nil {
 			return err
 		}
+		s.nullValue.Valid = true
 	}
 
 	return nil
